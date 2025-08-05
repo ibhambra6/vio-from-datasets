@@ -79,7 +79,10 @@ Example output:
 ATE (m, RMS): 0.0021
 RPE (m, RMS @ delta=1): 0.0007
 ```
-(A plot window will also appear)
+Example plot output:
+
+![Sample Plot Output](outputs/sample_output.PNG)
+
 
 ## Project Structure
 
