@@ -9,3 +9,36 @@ __pycache__/
 *.pyzw
 *.pyzwz
 *.pyzwzw
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Environments and caches
+.env
+env/
+venv/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+
+# Coverage and logs
+.coverage
+coverage.xml
+htmlcov/
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated outputs
+outputs/*.png
+outputs/*.PNG
+!outputs/sample_output.PNG

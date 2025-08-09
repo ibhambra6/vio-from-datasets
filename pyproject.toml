@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vio-from-datasets"
+version = "0.2.0"
+description = "Minimal, laptop-runnable Visual Odometry/VIO starter with synthetic PnP demo"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "VIO Contributors"}]
+dependencies = [
+  "numpy==1.26.4",
+  "scipy==1.11.4",
+  "matplotlib==3.8.4",
+  "opencv-python==4.9.0.80",
+]
+
+[project.scripts]
+vio-demo = "demos.run_synthetic:main"
+
+[tool.setuptools]
+packages = ["vio", "demos"]
+

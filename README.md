@@ -10,13 +10,13 @@ Before you begin, ensure you have the following installed on your system.
 
 ### Windows
 
-- **Python 3.8-3.12**: Download a compatible version from the [official Python website](https://www.python.org/downloads/). **Note:** As of July 2024, versions newer than 3.12 may cause build issues with dependencies like `scipy`. Make sure to check "Add Python to PATH" during installation.
+- **Python 3.10–3.12**: Download a compatible version from the [official Python website](https://www.python.org/downloads/). Make sure to check "Add Python to PATH" during installation.
 - **Git**: Download and install from [git-scm.com](https://git-scm.com/download/win).
 
 ### macOS
 
 - **Homebrew**: If you don't have it, install it by running the command on the [Homebrew website](https://brew.sh/).
-- **Python 3.8-3.12** and **Git**: Install using Homebrew:
+- **Python 3.10–3.12** and **Git**: Install using Homebrew:
   ```bash
   brew install python@3.12 git
   ```
@@ -32,7 +32,7 @@ Follow these steps to set up the project locally.
     cd vio-from-datasets
     ```
 
-2.  **Create and activate a virtual environment with Python 3.12:**
+2.  **Create and activate a virtual environment (Python 3.12 recommended):**
 
     If you have multiple Python versions installed, you need to specify the path to the `python3.12` executable.
 
@@ -61,7 +61,13 @@ Follow these steps to set up the project locally.
 Once the setup is complete, you can run the main demo:
 
 ```bash
-python -m demos.run_synthetic
+python -m demos.run_synthetic --n-points 200 --cube-size 0.5 --n-poses 10 --radius 3.0 --height 0.2 --noise-px 0.8 --save-plot outputs/run.png
+```
+
+Or, after installing the package (editable or via pip), use the CLI entrypoint:
+
+```bash
+vio-demo --no-show --save-plot outputs/run.png
 ```
 
 This script will perform the following actions:
@@ -92,12 +98,22 @@ The repository is organized as follows:
 .
 ├── demos/              # Runnable demo scripts
 │   └── run_synthetic.py
+├── tools/              # Utilities (e.g., benchmarking)
+│   └── benchmark.py
 ├── vio/                # Core VIO/VO library code
 │   ├── camera.py       # Pinhole camera model
 │   ├── evaluate.py     # Trajectory evaluation metrics (ATE, RPE)
 │   ├── geometry.py     # Geometric transformations and utilities
 │   ├── io.py           # Data I/O, synthetic scene generation
 │   └── pnp_demo.py     # PnP-based pose estimation logic
+│   └── datasets/       # Dataset loader scaffolds (EuRoC, TUM-VI)
+│       ├── base.py
+│       ├── euroc.py
+│       └── tum_vi.py
+├── tests/              # Basic tests
+│   └── test_basic.py
+├── .github/workflows/ci.yml  # CI pipeline
+├── Makefile            # Common tasks
 ├── README.md
 └── requirements.txt
 ```
@@ -122,7 +138,34 @@ This repository is designed to be a simple, accessible sandbox for learning, res
     - **Experiment with different camera trajectories:** Modify `vio/io.py` to generate more complex camera motions (e.g., adding loops or more aggressive rotations) and see how the PnP algorithm holds up.
     - **Simulate different scene structures:** Change `generate_cube_scene` to create a planar scene or a random cloud of points and analyze how the feature distribution affects performance.
 
-This project provides a ready-made scaffold for testing new theories in 3D computer vision without the overhead of building a complex system from the ground up.
+This project provides a ready-made scaffold for testing new theories in 3D computer vision without the overhead of building a complex system from the ground up. It now also includes:
+
+- **Configurable CLI** for `demos/run_synthetic.py`
+- **Structured logging** with `vio.logging_utils`
+- **Safer numerics** and input validation throughout
+- **Optional plot saving** via `plot_traj(..., save_path=...)`
+- **Basic tests** under `tests/` to sanity-check core functionality
+- **Benchmarking** via `tools/benchmark.py` and `make bench`
+- **CI** via GitHub Actions under `.github/workflows/ci.yml`
+- **Dataset scaffolds** at `vio/datasets/` to later plug in EuRoC/TUM-VI
+
+## API Overview
+
+- `vio.PinholeCamera`: Pinhole camera intrinsics with validation and undistortion.
+- `vio.io.generate_cube_scene(n_points, cube_size, seed) -> np.ndarray`: Synthetic 3D points.
+- `vio.io.generate_camera_poses(n_poses, radius, height) -> List[np.ndarray]`: Circular camera poses.
+- `vio.pnp_demo.run_pnp_sequence(pts3d, cam, gt_Ts, noise_px, seed, ...) -> List[np.ndarray]`: PnP sequence.
+- `vio.evaluate.trajectory_ATE(gt_Ts, est_Ts) -> float`: Absolute Trajectory Error.
+- `vio.evaluate.trajectory_RPE(gt_Ts, est_Ts, delta) -> float`: Relative Pose Error.
+- `vio.evaluate.plot_traj(gt_Ts, est_Ts, show=True, save_path=None) -> (Figure, Axes)`: 3D plot utility.
+
+## Makefile Shortcuts
+
+- `make setup`: install deps, pytest, pre-commit
+- `make dev`: editable install with console script `vio-demo`
+- `make test`: run tests
+- `make demo`: run the synthetic demo and save a plot
+- `make bench`: run small runtime/accuracy benchmarks
 
 ## How to Contribute
 
